@@ -17,16 +17,20 @@ function NamePrompt({ onNameEntered }) {
         }
 
         try {
-            // Save to Appwrite
-            await databases.createDocument(DATABASE_ID, VISITOR_COLLECTION_ID, ID.unique(), {
-                name,
-            });
-
-            // Save to localStorage
+            if (DATABASE_ID && VISITOR_COLLECTION_ID) {
+                // Save to Appwrite
+                await databases.createDocument(DATABASE_ID, VISITOR_COLLECTION_ID, ID.unique(), {
+                    name,
+                });
+            } else {
+                console.warn("⚠️ Appwrite environment variables not configured. Skipping remote name save.");
+            }
+        } catch (error) {
+            console.error("❌ Failed to save name to Appwrite:", error);
+        } finally {
+            // Save to localStorage and proceed regardless of Appwrite success/failure
             localStorage.setItem("visitorName", name);
             onNameEntered(name);
-        } catch (error) {
-            console.error("❌ Failed to save name:", error);
         }
     };
 
